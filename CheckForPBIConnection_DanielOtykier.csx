@@ -9,10 +9,13 @@
 #r "Microsoft.AnalysisServices.Core.dll"
 
 var server = Model.Database.TOMDatabase.Server as Microsoft.AnalysisServices.Tabular.Server;
-var isPbiDesktop = server.ServerLocation == Microsoft.AnalysisServices.ServerLocation.OnPremise
+var isLoadedFromFile = server == null;
+var isPbiDesktop = sever != null && server.ServerLocation == Microsoft.AnalysisServices.ServerLocation.OnPremise
     && server.CompatibilityMode == Microsoft.AnalysisServices.CompatibilityMode.PowerBI;
 
-if (isPbiDesktop)
+if (isLoadedFromFile)
+    Info("Metadata loaded from file");
+else if (isPbiDesktop)
     Info("Connected to PBI Desktop");
 else
     Info("Not connected to PBI Desktop");
