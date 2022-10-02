@@ -62,11 +62,19 @@ string ParameterColumnName =
 
 string ParameterMeasureName = ParameterTableName + " Value";
 string ParameterMeasureDax =
-    "SELECTEDVALUE(" + ParameterColumnName + ","
-    + String.Format("{0})", ParameterDefault)
-    ;
+        string.Format(
+            "SELECTEDVALUE ({0}), {1}",
+            ParameterColumnName,
+            ParameterDefault
+        );
 
-
+Table ParamemerCalcTable = Model.AddCalculatedTable(ParameterTableName, ParameterTableDax);
+Measure ParameterMeasure = ParamemerCalcTable.AddMeasure(
+    ParameterMeasureName,
+    ParameterMeasureDax,
+    ParameterColumnName.DisplayFolder
+    );
+ParameterMeasure.FormatDax();
 
 ParameterTableName.Output();
 
@@ -111,8 +119,15 @@ string ParameterTableDax =
     ParameterStep
     );
 
-//Model.AddCalculatedTable(ParameterTableName, ParameterTableDax) ;
+string ParameterMeasureDax = 
+        string.Format(
+            "SELECTEDVALUE ({0}), {1}", 
+            ParameterColumnName, 
+            ParameterDefault
+        );
 
+Table ParamemerCalcTable = Model.AddCalculatedTable(ParameterTableName, ParameterTableDax) ;
+Measure ParamemerCalcTable.AddMeasure();
 
 //TopNTable = Model.AddCalculatedTable(ParameterTableName, ParameterTableDax) ;
 
@@ -130,7 +145,7 @@ string RankingMeasureDax =
 
 Selected.Column.DaxObjectName.Output();
 
-/*-------- Add Mes ---------*/
+/*-------- Add Measures ---------*/
 
 /* Generate Measures for "TopN + Others" pattern */
 
