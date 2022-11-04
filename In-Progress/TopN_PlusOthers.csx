@@ -1,7 +1,14 @@
 /*
- 
+ This script was inspired by the article from SQLBI https://sql.bi/695263
  
  */
+
+Info("Select TopN What-If Parameter");
+Table StartTableTopN = Model.SelectTable();
+Measure MeasureTopN = StartTableTopN.SelectMeasure();
+var MeasureTopNReference = MeasureTopN.DaxObjectName;
+// MeasureTopNReference.Output();
+
 
 Info("Select the table to implement TopN + Others for");
 
@@ -20,6 +27,58 @@ string TopNTableExpression =
 
 
 TopNTableExpression.Output();
+
+
+
+
+string RankingMeasureReference =
+Model.Tables["Fact"].Measures["Total GMV"].DaxObjectFullName;
+
+Table StartTable =
+(Model.Tables["Supplier"] as Table);
+// Model.SelectTable(null, "Select the table to implement TopN + Others for");
+
+string StartTableName = StartTable.DaxObjectFullName;
+Table ReferenceTable =
+    (Model.Tables["Supplier Names"] as CalculatedTable);
+// Model.SelectTable(null,"Select resulting table:");
+
+
+string ReferenceTableName = ReferenceTable.DaxObjectFullName;
+string ReferenceColumnName = ReferenceTable.Columns.First().DaxObjectFullName;
+string RankingMeasureName = "Ranking";
+string RankingMeasureDax =
+    "IF( ISINSCOPE( " + ReferenceColumnName + "), " + "\n"
+    + "VAR ProductsToRank = [TopN Value]" + " \n "
+    + "VAR SalesAmount = " + RankingMeasureReference
+    + " \n "
+    + "VAR IsOtherSelected = SELECTEDVALUE ( " + ReferenceColumnName + ") = \"Others\" " + "\n"
+    + "RETURN " + "\n"
+    + "IF( IsOtherSelected," + "\n"
+    + "ProductsToRank + 1, " + "\n"
+    + "IF( SalesAmount > 0," + "\n"
+    + "VAR VisibleProducts = CALCULATETABLE ( VALUES ( " + StartTableName + " ), ALLSELECTED ( "
+            + ReferenceTableName + ") )"
+            + "\n"
+            + "VAR Ranking = RANKX ( VisibleProducts, "
+            + RankingMeasureReference
+            + " , SalesAmount )"
+            + "\n"
+    + "RETURN" + "\n"
+    + "IF ( Ranking > 0 && Ranking <= ProductsToRank, Ranking )" + "\n"
+    + ")))"
+    ;
+
+// Add Ranking measure to the table 
+// ReferenceTable.AddMeasure(RankingMeasureName,RankingMeasureDax,null );
+
+
+string formatedoutput = FormatDax(RankingMeasureDax);
+
+formatedoutput.Output();
+
+
+
 
 
 
