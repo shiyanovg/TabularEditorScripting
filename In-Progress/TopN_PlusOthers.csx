@@ -5,6 +5,11 @@
 
 Info("Select TopN What-If Parameter");
 Table StartTableTopN = Model.SelectTable();
+// Set Annotation for object StartTable
+StartTableTopN.SetAnnotation(
+    "TopNScript_StartTableTopN_ShiyanovG"
+    , "TopNScript_StartTableTopN_ShiyanovG"
+    );
 Measure MeasureTopN = StartTableTopN.SelectMeasure();
 var MeasureTopNReference = MeasureTopN.DaxObjectName;
 // MeasureTopNReference.Output();
@@ -13,6 +18,12 @@ var MeasureTopNReference = MeasureTopN.DaxObjectName;
 // Info("Select the table to implement TopN + Others for");
 
 Table StartTable = Model.SelectTable(null, "Select the table to implement TopN + Others for");
+// Set Annotation for object StartTable
+StartTable.SetAnnotation(
+    "TopNScript_StartTable_ShiyanovG"
+    , "TopNScript_StartTable_ShiyanovG"
+    );
+
 Column StartColumn =
 StartTable.Columns
 .Where(c => c.UsedInRelationships.Any() == false)
@@ -30,7 +41,7 @@ string TopNTableExpression =
 + "\n )";
 
 
-TopNTableExpression.Output();
+// TopNTableExpression.Output();
 
 
 
@@ -273,4 +284,16 @@ FormatDax("Test:= " + RankingMeasureDax).Output();
 (Model.Tables["Supplier"] as Table).Columns
 .Where(c => c.UsedInRelationships.Any() == false)
 .Output();
+
+
+// Set Annotation for object
+Selected.Table.SetAnnotation("Test Name", "Test Value")
+
+    // Search model tables for annotations
+foreach (var t in Model.Tables
+    .Where(t => t.GetAnnotation("Test") == "Test Value")
+    .ToList())
+{
+    t.Output();
+}
 
