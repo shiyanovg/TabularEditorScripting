@@ -10,12 +10,16 @@ var MeasureTopNReference = MeasureTopN.DaxObjectName;
 // MeasureTopNReference.Output();
 
 
-Info("Select the table to implement TopN + Others for");
+// Info("Select the table to implement TopN + Others for");
 
-Table StartTable = Model.SelectTable();
-Column StartColumn = StartTable.SelectColumn();
+Table StartTable = Model.SelectTable(null, "Select the table to implement TopN + Others for");
+Column StartColumn =
+StartTable.Columns
+.Where(c => c.UsedInRelationships.Any() == false)
+.SelectColumn(null, "Select the column to use for TopN + Others");
 
 // StartColumn.DaxObjectFullName.Output();
+
 
 
 string TopNTableExpression =
@@ -69,9 +73,23 @@ string RankingMeasureDax =
     + ")))"
     ;
 
-// Add Ranking measure to the table 
-// ReferenceTable.AddMeasure(RankingMeasureName,RankingMeasureDax,null );
 
+
+// Add Ranking measure to the table 
+// ReferenceTable.AddMeasure(RankingMeasureName, RankingMeasureDax, null );
+
+string VisibleRowMeasureDax =
+"VAR Ranking = [Ranking] "
+    + "\n"
++ "VAR TopNValue = [TopN Value]"
+  + "\n"
+    + "VAR Result =  IF( NOT ISBLANK(Ranking),  (Ranking <= TopNValue) - (Ranking = TopNValue + 1) ) "
+  + "\n"
+    + " RETURN  Result "
+    ;
+
+// Add Visible Row measure to the table 
+// ReferenceTable.AddMeasure("Visible Row", RankingMeasureDax, null );
 
 string formatedoutput = FormatDax(RankingMeasureDax);
 
@@ -238,6 +256,8 @@ string RankingMeasureDax =
 FormatDax("Test:= " + RankingMeasureDax).Output();
 
 
-
-
+/*----- Check if Column is Used In Relationships*/
+(Model.Tables["Supplier"] as Table).Columns
+.Where(c => c.UsedInRelationships.Any() == false)
+.Output();
 
