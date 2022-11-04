@@ -43,7 +43,19 @@ string TopNTableExpression =
 
 // TopNTableExpression.Output();
 
+string FullPowerBITableExpression =
+StartTable.Name + " Names = "
++ "\n"
++ TopNTableExpression;
 
+Info("Copy to Clipboard the following code and create new Calucated Table");
+//FormatDax(FullPowerBITableExpression).Output();
+
+// Set Annotation for object StartTable
+StartTable.SetAnnotation(
+    "TopNScript_ReferenceTable_ShiyanovG"
+    , "TopNScript_ReferenceTable_ShiyanovG"
+    );
 
 
 string RankingMeasureReference =
@@ -297,3 +309,9 @@ foreach (var t in Model.Tables
     t.Output();
 }
 
+// Get ReferencedBy Tables
+Selected.Table
+.ReferencedBy
+.Where(r => r.ObjectType == ObjectType.Table)
+.First()
+.Output();
