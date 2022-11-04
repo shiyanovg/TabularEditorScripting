@@ -105,6 +105,19 @@ formatedoutput.Output();
 using Microsoft.VisualBasic;
 
 
+string ConfigInpuBoxText =
+    "1 - Measures"
+    + "\n"
+    + "2 - Calculation Group"
+    ;
+int ConfigDefaultInput = 1;
+Interaction.InputBox(
+ConfigInpuBoxText,
+   "Choose configuration of execution",
+   ConfigDefaultInput.ToString(),
+   740,
+   400);
+
 string ParameterTableNameInpuBoxTitle = "What-If Parameter Name";
 string ParameterTableNameInpuBoxText = "Provide a name for your What-If Parameter";
 string ParameterTableNameDefaultInput = "Top N";
