@@ -111,6 +111,18 @@ string VisibleRowMeasureDax =
     + " RETURN  Result "
     ;
 
+string VisibleRowMeasureDax =
+@"
+VAR Ranking = [Ranking] 
+VAR TopNValue = [TopN Value]
+VAR Result =  
+    IF( 
+        NOT ISBLANK(Ranking), 
+        (Ranking <= TopNValue) - (Ranking = TopNValue + 1) 
+    ) 
+RETURN  Result " ;
+
+
 // Add Visible Row measure to the table 
 // ReferenceTable.AddMeasure("Visible Row", RankingMeasureDax, null );
 
