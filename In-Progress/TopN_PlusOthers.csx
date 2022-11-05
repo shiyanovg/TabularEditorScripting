@@ -4,6 +4,7 @@
  Code example for checking connection to Power BI Desktop was provided by Daniel Otykier 
    For more detail see the this link: https://github.com/TabularEditor/TabularEditor/issues/1010
 
+    Requirements: Create What-If Parameter before running this code!
 
  */
 
