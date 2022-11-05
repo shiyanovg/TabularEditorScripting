@@ -7,6 +7,7 @@ foreach (var c in Model.AllColumns)
     }
     else if (
         // Check if a column is referenced by Any measure of your model
+        // Check for only SUM, MIN, MAX, DISTINCTCOUNT measures in progress
         c.ReferencedBy.AllMeasures.Any()
         )
     {
