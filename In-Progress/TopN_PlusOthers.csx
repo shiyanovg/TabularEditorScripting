@@ -3,116 +3,130 @@
  
  */
 
-Info("Select TopN What-If Parameter");
-Table StartTableTopN = Model.SelectTable();
-// Set Annotation for object StartTable
-StartTableTopN.SetAnnotation(
-    "TopNScript_StartTableTopN_ShiyanovG"
-    , "TopNScript_StartTableTopN_ShiyanovG"
-    );
-Measure MeasureTopN = StartTableTopN.SelectMeasure();
-var MeasureTopNReference = MeasureTopN.DaxObjectName;
-// MeasureTopNReference.Output();
+
+//Info("Select TopN What-If Parameter");
+
+Table StartTableTopN = Model.SelectTable(null, "Select TopN What-If Parameter");
+bool CheckForTopN = StartTableTopN == null;
+if (CheckForTopN)
+{
+    Error("No TopN What-If");
+    return;
+}
+else
+{
+    Info("OK");
+
+    var ListOfFactTables = new List<Table>();
+    var ListOfDimentionTables = new List<Table>();
+
+    foreach (var r in Model.Relationships)
+    {
+        Table ManyColTable = r.FromColumn.Table;
+        // Table ManyColTable = r.FromColumn.Table;
+        bool notInListFact = ListOfFactTables.Contains(ManyColTable);
+        if (notInListFact == false)
+        {
+            ListOfFactTables.Add(ManyColTable);
+        }
+    }
+
+    foreach (var r in Model.Relationships)
+    {
+        Table OneColTable = r.ToColumn.Table;
+        bool NotDate = r.ToColumn.DataType == DataType.DateTime;
+        bool notInListDim = ListOfDimentionTables.Contains(OneColTable);
+        if (notInListDim == false && NotDate == false)
+        {
+            ListOfDimentionTables.Add(OneColTable);
+        }
+    }
+
+    // Set Annotation for object StartTable
+    StartTableTopN.SetAnnotation(
+        "TopNScript_StartTableTopN_ShiyanovG"
+        , "TopNScript_StartTableTopN_ShiyanovG"
+        );
+    Measure MeasureTopN = StartTableTopN.SelectMeasure(null, "Select TopN measure");
+    var MeasureTopNReference = MeasureTopN.DaxObjectName;
+    Table StartTable = ListOfDimentionTables.SelectTable(null, "Select the table to implement TopN + Others for");
+    string StartTableName = StartTable.DaxObjectFullName;
+    // Set Annotation for object StartTable
+    StartTable.SetAnnotation(
+        "TopNScript_StartTable_ShiyanovG"
+        , "TopNScript_StartTable_ShiyanovG"
+        );
+
+    Column StartColumn =
+    StartTable.Columns
+    .Where(c => c.UsedInRelationships.Any() == false)
+    .SelectColumn(null, "Select the column to use for TopN + Others");
 
 
-// Info("Select the table to implement TopN + Others for");
+    Table FactTable = ListOfFactTables.SelectTable(null, "Where is your main Fact Table");
+    Measure RankingMeasureReference = FactTable.SelectMeasure(null, "What is you base measure for the pattern");
+    string RankingMeasureReferenceName = RankingMeasureReference.DaxObjectFullName;
 
-Table StartTable = Model.SelectTable(null, "Select the table to implement TopN + Others for");
-// Set Annotation for object StartTable
-StartTable.SetAnnotation(
-    "TopNScript_StartTable_ShiyanovG"
-    , "TopNScript_StartTable_ShiyanovG"
-    );
-
-Column StartColumn =
-StartTable.Columns
-.Where(c => c.UsedInRelationships.Any() == false)
-.SelectColumn(null, "Select the column to use for TopN + Others");
-
-// StartColumn.DaxObjectFullName.Output();
-
-
-
-string TopNTableExpression =
-"UNION( "
-+ "ALLNOBLANKROW( " + StartColumn.DaxObjectFullName + "),"
-+ "\n"
-+ "{ \"Others\" }"
-+ "\n )";
-
-
-// TopNTableExpression.Output();
-
-string FullPowerBITableExpression =
-StartTable.Name + " Names = "
-+ "\n"
-+ TopNTableExpression;
-
-Info("Copy to Clipboard the following code and create new Calucated Table");
-//FormatDax(FullPowerBITableExpression).Output();
-
-// Set Annotation for object StartTable
-StartTable.SetAnnotation(
-    "TopNScript_ReferenceTable_ShiyanovG"
-    , "TopNScript_ReferenceTable_ShiyanovG"
-    );
-
-
-string RankingMeasureReference =
-Model.Tables["Fact"].Measures["Total GMV"].DaxObjectFullName;
-
-Table StartTable =
-(Model.Tables["Supplier"] as Table);
-// Model.SelectTable(null, "Select the table to implement TopN + Others for");
-
-string StartTableName = StartTable.DaxObjectFullName;
-Table ReferenceTable =
-    (Model.Tables["Supplier Names"] as CalculatedTable);
-// Model.SelectTable(null,"Select resulting table:");
-
-
-string ReferenceTableName = ReferenceTable.DaxObjectFullName;
-string ReferenceColumnName = ReferenceTable.Columns.First().DaxObjectFullName;
-string RankingMeasureName = "Ranking";
-string RankingMeasureDax =
-    "IF( ISINSCOPE( " + ReferenceColumnName + "), " + "\n"
-    + "VAR ProductsToRank = [TopN Value]" + " \n "
-    + "VAR SalesAmount = " + RankingMeasureReference
-    + " \n "
-    + "VAR IsOtherSelected = SELECTEDVALUE ( " + ReferenceColumnName + ") = \"Others\" " + "\n"
-    + "RETURN " + "\n"
-    + "IF( IsOtherSelected," + "\n"
-    + "ProductsToRank + 1, " + "\n"
-    + "IF( SalesAmount > 0," + "\n"
-    + "VAR VisibleProducts = CALCULATETABLE ( VALUES ( " + StartTableName + " ), ALLSELECTED ( "
-            + ReferenceTableName + ") )"
-            + "\n"
-            + "VAR Ranking = RANKX ( VisibleProducts, "
-            + RankingMeasureReference
-            + " , SalesAmount )"
-            + "\n"
-    + "RETURN" + "\n"
-    + "IF ( Ranking > 0 && Ranking <= ProductsToRank, Ranking )" + "\n"
-    + ")))"
-    ;
-
-
-
-// Add Ranking measure to the table 
-// ReferenceTable.AddMeasure(RankingMeasureName, RankingMeasureDax, null );
-
-string VisibleRowMeasureDax =
-"VAR Ranking = [Ranking] "
+    string TopNTableExpression =
+    "UNION( "
+    + "ALLNOBLANKROW( " + StartColumn.DaxObjectFullName + "),"
     + "\n"
-+ "VAR TopNValue = [TopN Value]"
-  + "\n"
-    + "VAR Result =  IF( NOT ISBLANK(Ranking),  (Ranking <= TopNValue) - (Ranking = TopNValue + 1) ) "
-  + "\n"
-    + " RETURN  Result "
-    ;
+    + "{ \"Others\" }"
+    + "\n )";
 
-string VisibleRowMeasureDax =
-@"
+    string TopNTableName = StartTable.Name + " Names";
+    string FullPowerBITableExpression =
+    TopNTableName + " = "
+    + "\n"
+    + TopNTableExpression;
+
+    Info("Copy to Clipboard the following code and create new Calucated Table");
+    FullPowerBITableExpression.Output();
+
+    Table ReferenceTable = Model.Tables[TopNTableName];
+    ReferenceTable.SetAnnotation(
+        "TopNScript_ReferenceTable_ShiyanovG"
+        , "TopNScript_ReferenceTable_ShiyanovG"
+        );
+
+    string ReferenceTableName = ReferenceTable.DaxObjectFullName;
+    string ReferenceColumnName = ReferenceTable.Columns.First().DaxObjectFullName;
+    string RankingMeasureName = "Ranking";
+    string Others = " \"Others\" ";
+    string RankingMeasureDax =
+      @"
+IF (
+    ISINSCOPE ( {1} ),
+    VAR ProductsToRank = [TopN Value] 
+    VAR SalesAmount = {3} 
+    VAR IsOtherSelected =
+        SELECTEDVALUE ( {1} ) = {0}  
+    RETURN
+        IF(
+            IsOtherSelected,
+            -- Rank for Others
+            ProductsToRank + 1,
+            -- Rank for regular products
+            IF (
+                SalesAmount > 0,
+                VAR VisibleProducts =
+                    CALCULATETABLE(VALUES({1}), ALLSELECTED({2}))
+                VAR Ranking =
+                    RANKX(VisibleProducts, {3}, SalesAmount)
+                RETURN
+                    IF (Ranking > 0 && Ranking <= ProductsToRank, Ranking )
+            )
+        ) 
+ ) 
+ ";
+    string RankingMeasureDaxFormatted = string.Format(
+     RankingMeasureDax, Others, ReferenceColumnName,
+     ReferenceTableName, RankingMeasureReferenceName
+     );
+    // Add Ranking measure to the table with Formatted code
+    ReferenceTable.AddMeasure(RankingMeasureName, RankingMeasureDaxFormatted, null);
+    string VisibleRowMeasureDax =
+       @"
 VAR Ranking = [Ranking] 
 VAR TopNValue = [TopN Value]
 VAR Result =  
@@ -120,20 +134,81 @@ VAR Result =
         NOT ISBLANK(Ranking), 
         (Ranking <= TopNValue) - (Ranking = TopNValue + 1) 
     ) 
-RETURN  Result " ;
+RETURN  Result ";
 
 
-// Add Visible Row measure to the table 
-// ReferenceTable.AddMeasure("Visible Row", RankingMeasureDax, null );
+    // Add Visible Row measure to the table 
+    ReferenceTable.AddMeasure("Visible Row", VisibleRowMeasureDax, null);
+    // Generate code for desired measure (for example Sales Amount)
+    string AddColsColumn = "@SalesAmount";
+    string q = "\"";
+    string AmountNAMeasureDax = @"
+ VAR SalesOfAll =
+ CALCULATE ( {6}, REMOVEFILTERS ( {5} ) )
+RETURN
+    IF (
+        NOT ISINSCOPE ( {3} ),
+        -- Calculation for a group of products 
+        SalesOfAll,
+        -- Calculation for one product name
+        VAR ProductsToRank = [TopN Value]
+        VAR SalesOfCurrentProduct = {6}
+        VAR IsOtherSelected =
+            SELECTEDVALUE ( {3} ) = {0}
+        RETURN
+            IF(
+                NOT IsOtherSelected,
+                -- Calculation for a regular product
+                SalesOfCurrentProduct,
+                -- Calculation for Others
+                VAR VisibleProducts =
+                    CALCULATETABLE(
+                        VALUES({4}),
+                        REMOVEFILTERS({3})
+                    )
+                VAR ProductsWithSales =
+                    ADDCOLUMNS(VisibleProducts, {1}{2}{1} , [Sales Amount])
+                VAR FilterTopProducts =
+                TOPN(ProductsToRank, ProductsWithSales, [{2}])
+                VAR FilterOthers =
+                    EXCEPT(ProductsWithSales, FilterTopProducts)
+                VAR SalesOthers =
+                    CALCULATE(
+                        {6},
+                        FilterOthers,
+                        REMOVEFILTERS ( {3} )
+                    )
+                RETURN
+                    SalesOthers
+            )
+            )"
+                ;
+    string AmountNAMeasureDaxFormatted =
+        string.Format(
+            AmountNAMeasureDax
+            , Others  // 0
+            , q // 1
+            , AddColsColumn // 2
+            , ReferenceColumnName // 3
+            , StartTableName // 4
+            , ReferenceTableName // 5
+            , RankingMeasureReferenceName // 6
+            );
+    string AmountNAMeasureName = RankingMeasureReference.Name + " NA";
 
-string formatedoutput = FormatDax(RankingMeasureDax);
+    // Add AmountNA measure to the table 
+    ReferenceTable.AddMeasure(
+        AmountNAMeasureName
+        , AmountNAMeasureDaxFormatted
+        , null
+        );
 
-formatedoutput.Output();
+    // Format all created measures
+    ReferenceTable.Measures.FormatDax();
+}
 
 
-
-
-
+//==================================================================================//
 
 /* Additinal scripting - In progress */
 #r "Microsoft.VisualBasic"
@@ -327,3 +402,14 @@ Selected.Table
 .Where(r => r.ObjectType == ObjectType.Table)
 .First()
 .Output();
+
+
+
+
+Model
+.AllColumns
+.Where(c => c.UsedInRelationships.Any() == true)
+.ToList()
+.Output()
+;
+
