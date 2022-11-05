@@ -42,7 +42,8 @@ if (HasScriptAnnotations == true)
 
 var server = Model.Database.TOMDatabase.Server as Microsoft.AnalysisServices.Tabular.Server;
 var isLoadedFromFile = server == null;
-var isPbiDesktop = server != null && server.ServerLocation == Microsoft.AnalysisServices.ServerLocation.OnPremise
+var isPbiDesktop = server != null 
+    && server.ServerLocation == Microsoft.AnalysisServices.ServerLocation.OnPremise
     && server.CompatibilityMode == Microsoft.AnalysisServices.CompatibilityMode.PowerBI;
 
 if (isLoadedFromFile)
