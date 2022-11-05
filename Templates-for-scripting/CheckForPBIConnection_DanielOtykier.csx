@@ -14,8 +14,14 @@ var isPbiDesktop = server != null && server.ServerLocation == Microsoft.Analysis
     && server.CompatibilityMode == Microsoft.AnalysisServices.CompatibilityMode.PowerBI;
 
 if (isLoadedFromFile)
+{
     Info("Metadata loaded from file");
+}
 else if (isPbiDesktop)
+{
     Info("Connected to PBI Desktop");
+}
 else
+{
     Info("Not connected to PBI Desktop");
+}
