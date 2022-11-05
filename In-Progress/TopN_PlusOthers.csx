@@ -11,6 +11,34 @@
 #r "Microsoft.VisualBasic"
 using Microsoft.VisualBasic;
 
+
+var ListOfTableAnnotations = new List<string>();
+string RexExpPattern = "TopNScript_(.+?)_ShiyanovG";
+foreach (Table t in Model.Tables)
+{
+    foreach (var a in t.GetAnnotations())
+    {
+        // a.Output();
+        bool IsMatched =
+        a.IndexOf("TopNScript_", StringComparison.OrdinalIgnoreCase) >= 0
+        && a.IndexOf("_ShiyanovG", StringComparison.OrdinalIgnoreCase) >= 0
+        ;
+        if (IsMatched)
+        {
+            ListOfTableAnnotations.Add(a);
+        }
+    }
+}
+
+bool HasScriptAnnotations = ListOfTableAnnotations.Count() > 0;
+
+if (HasScriptAnnotations == true)
+{
+    Info("TopN Script already implemented");
+    return;
+}
+
+
 var server = Model.Database.TOMDatabase.Server as Microsoft.AnalysisServices.Tabular.Server;
 var isLoadedFromFile = server == null;
 var isPbiDesktop = server != null && server.ServerLocation == Microsoft.AnalysisServices.ServerLocation.OnPremise
