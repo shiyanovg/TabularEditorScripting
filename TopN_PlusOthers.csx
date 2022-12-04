@@ -1,3 +1,8 @@
+#r "Microsoft.AnalysisServices.Core.dll"
+#r "Microsoft.VisualBasic"
+using Microsoft.VisualBasic;
+
+
 /*
  This script was inspired by the article from SQLBI https://sql.bi/695263
  
@@ -6,11 +11,9 @@
 
     Requirements: Create What-If Parameter before running this code!
 
+    Remove this comment to avoid bugs
  */
 
-#r "Microsoft.AnalysisServices.Core.dll"
-#r "Microsoft.VisualBasic"
-using Microsoft.VisualBasic;
 
 
 var ListOfTableAnnotations = new List<string>();
@@ -267,7 +270,7 @@ RETURN
                 );
         string AmountNAMeasureName = RankingMeasureReference.Name + " NA";
 
-        if (ConfigAnswer == 1)
+        if (ConfigAnswer == "1")
         {
             // Add Ranking measure to the table with Formatted code
             ReferenceTable.AddMeasure(RankingMeasureName, RankingMeasureDaxFormatted, null);
@@ -282,11 +285,11 @@ RETURN
             // Format all created measures
             ReferenceTable.Measures.FormatDax();
         }
-        else if (ConfigAnswer==2)
+        else if (ConfigAnswer=="2")
         {
             string Config2Text = @"
             Corrently code doesn't support Calc Group implementation.
-            Press \"OK\" to create measures."
+            Press OK to create measures.";
             Info(Config2Text);
 
             // Add Ranking measure to the table with Formatted code
