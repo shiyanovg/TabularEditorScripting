@@ -16,6 +16,15 @@ int value_step_default = 1;
 
 int value_step = 1;
 
+var measure_default_value = Convert.ToInt64(
+                                            Math.Round(
+                                                Convert.ToDouble(
+                                                        value_end / 2
+                                                        )
+                                                , 1, MidpointRounding.ToEven
+                                            )
+                                        );
+
 
 string TableName = "My Table";
 string TableExpression = "GENERATESERIES({0},{1},{2})";
