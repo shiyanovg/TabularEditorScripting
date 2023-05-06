@@ -16,9 +16,9 @@ int value_step_default = 1;
 
 int value_step = 1;
 
-var measure_default_value = Convert.ToInt64(
-                                            Math.Round(
-                                                Convert.ToDouble(
+var measure_default_value = Convert.ToInt64 (
+                                            Math.Round (
+                                                Convert.ToDouble (
                                                         value_end / 2
                                                         )
                                                 , 1, MidpointRounding.ToEven
@@ -26,7 +26,13 @@ var measure_default_value = Convert.ToInt64(
                                         );
 
 
-string TableName = "My Table";
+
+string TableName = Interaction.InputBox(
+            "Choose the name for What-If Parameter",
+            "Name for What-If Parameter",
+             "",
+            740,
+            400);
 string TableExpression = "GENERATESERIES({0},{1},{2})";
 string TableExpression_formatted = String.Format(TableExpression
     , value_start, value_end, value_step);
