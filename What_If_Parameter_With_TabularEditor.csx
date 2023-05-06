@@ -24,4 +24,23 @@ string TableExpression_formatted = String.Format(TableExpression
 
 
 // Add New Calculated Table to the Model (What-If Parameter)
-Model.AddCalculatedTable(TableName, TableExpression);
+Table WhatIfParameterCalcTable = Model.AddCalculatedTable(TableName, TableExpression);
+
+// Name column same as table
+Column WhatIfColumn = WhatIfParameterCalcTable.Columns.First().Name = TableName;
+
+// Create DAX Expression for What-If Parameter measure
+string MeasureDaxExpression = String.Format(
+            "SELECTEDVALUE({0},{1})"
+            , WhatIfColumn.DaxObjectFullName()
+            , measure_default_value
+            );
+string MeasureName = String.Format("{0} Value", TableName);
+
+
+// Add measure for What-If parameter
+WhatIfParameterCalcTable.AddMeasure(
+    MeasureName
+    , MeasureDaxExpression
+    ).FormatString = "#,##0";
+
