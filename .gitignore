@@ -351,4 +351,5 @@ MigrationBackup/
 /ClassLibraryForAdvancedScripting
 
 # Hide tests folder
-.Tests/
+Tests/
+
