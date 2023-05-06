@@ -1,5 +1,10 @@
 #r "Microsoft.AnalysisServices.Core.dll"
 #r "Microsoft.VisualBasic"
+#r "System.Drawing"
+
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Microsoft.VisualBasic;
 
 int value_start_default = 1;
