@@ -257,7 +257,7 @@ using (Form prompt = new Form())
         // Name column same as table
         Column WhatIfColumn = WhatIfParameterCalcTable.AddCalculatedTableColumn(
         TableName
-            , "Value"
+            , "[Value]" 
             , null
             , DataType.Int64
             );
@@ -284,11 +284,11 @@ using (Form prompt = new Form())
 
         string MeasureName = String.Format("{0} Value", TableName);
         // Add measure for What-If parameter
-        WhatIfParameterCalcTable.AddMeasure(
+        Measure WhatIfValueMeasure = WhatIfParameterCalcTable.AddMeasure(
             MeasureName
             , MeasureDaxExpression
             ).FormatString = "#,0";
-
+        WhatIfValueMeasure.FormatDax();
 
         // Fix BPA Issues
         WhatIfParameterCalcTable.SetAnnotation(
@@ -296,8 +296,14 @@ using (Form prompt = new Form())
                 , "{\"RuleIDs\":[\"ENSURE_TABLES_HAVE_RELATIONSHIPS\",\"REDUCE_USAGE_OF_CALCULATED_TABLES\"]}"
         );
         WhatIfParameterCalcTable.Description = "What-If Parameter by Tabular Editor";
+        WhatIfColumn.Description = "What-If Column by Tabular Editor";
+
         WhatIfValueMeasure.Description = "What-If Value by Tabular Editor";
-        WhatIfColumn.Description = "What-If Column by Tabular Editor"";
+        WhatIfColumn.SetExtendedProperty(
+                 "ParameterMetadata"
+                 , "{\"version\":0}"
+                 , ExtendedPropertyType.Json
+                 );
 
 
     }
