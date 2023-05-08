@@ -5,6 +5,15 @@ using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 
+/* 
+ * Title: What-If Parameter With Tabular Editor
+ * 
+ * Author: George
+ *
+ *
+ *
+ */
+
 using (Form prompt = new Form())
 {
     Font formFont = new Font("Segoe UI", 11);
