@@ -252,7 +252,7 @@ using (Form prompt = new Form())
             );
 
         // Add New Calculated Table to the Model (What-If Parameter)
-        CalculatedTable WhatIfParameterCalcTable = Model.AddCalculatedTable(TableName, TableExpression);
+        CalculatedTable WhatIfParameterCalcTable = Model.AddCalculatedTable(TableName, TableExpression_formatted);
 
         // Name column same as table
         Column WhatIfColumn = WhatIfParameterCalcTable.AddCalculatedTableColumn(
