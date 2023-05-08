@@ -287,8 +287,17 @@ using (Form prompt = new Form())
         WhatIfParameterCalcTable.AddMeasure(
             MeasureName
             , MeasureDaxExpression
-            ).FormatString = "0";
+            ).FormatString = "#,0";
 
+
+        // Fix BPA Issues
+        WhatIfParameterCalcTable.SetAnnotation(
+                "BestPracticeAnalyzer_IgnoreRules"
+                , "{\"RuleIDs\":[\"ENSURE_TABLES_HAVE_RELATIONSHIPS\",\"REDUCE_USAGE_OF_CALCULATED_TABLES\"]}"
+        );
+        WhatIfParameterCalcTable.Description = "What-If Parameter by Tabular Editor";
+        WhatIfValueMeasure.Description = "What-If Value by Tabular Editor";
+        WhatIfColumn.Description = "What-If Column by Tabular Editor"";
 
 
     }
