@@ -285,9 +285,10 @@ using (Form prompt = new Form())
         string MeasureName = String.Format("{0} Value", TableName);
         // Add measure for What-If parameter
         Measure WhatIfValueMeasure = WhatIfParameterCalcTable.AddMeasure(
-            MeasureName
-            , MeasureDaxExpression
-            ).FormatString = "#,0";
+           MeasureName
+           , MeasureDaxExpression
+           );
+        WhatIfValueMeasure.FormatString = "#,0";
         WhatIfValueMeasure.FormatDax();
 
         // Fix BPA Issues
