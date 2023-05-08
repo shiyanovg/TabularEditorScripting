@@ -305,6 +305,7 @@ using (Form prompt = new Form())
                  , "{\"version\":0}"
                  , ExtendedPropertyType.Json
                  );
+        WhatIfColumn.SummarizeBy = AggregateFunction.None;
 
 
     }
