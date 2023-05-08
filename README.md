@@ -10,7 +10,7 @@ List of snippents supported against Power BI Desktop
 - [Organize columns in folders](https://github.com/shiyanovg/TabularEditorScripting/blob/main/OrganizeColumnsInFolders.csx)
 - ["TopN + Others" by SQLBI](https://github.com/shiyanovg/TabularEditorScripting/blob/main/TopN_PlusOthers.csx)
   - [Link to the article](https://www.sqlbi.com/articles/filtering-the-top-products-alongside-the-other-products-in-power-bi)
-- [Create What-If Parameter With Tabular Editor](/What_If_Parameter_With_TabuarEditor.csx)
+- [Create What-If Parameter With Tabular Editor](./What_If_Parameter_With_TabularEditor.csx)
 
 
 Additional links:
