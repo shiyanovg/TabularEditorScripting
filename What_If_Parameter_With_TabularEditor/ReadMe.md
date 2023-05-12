@@ -10,4 +10,16 @@ Scenarios why would you need this solution:
 Full code is avaliable [here](./What_If_Parameter_With_TabularEditor.csx).
 
 
+Steps:
+1. Copy the code from *.csx file
+
+2. Open your solution in Tabular Editor
+
+
+3. Paste the code into Tabular Editor ***C# Script*** window
+
+4. Run macro
+
+
+
 
